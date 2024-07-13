@@ -29,13 +29,13 @@ const DetailPage = () => {
     const handleFilter = () => {
         if (!rowData) return;
         const filtered = rowData.filter((row) => {
-            const rowDate = row.Date;
+            const rowDate = row.date;
 
             const dateInRange = (!fromDate || rowDate >= fromDate) && (!toDate || rowDate <= toDate);
 
             
 
-            return row.Id === id && dateInRange;
+            return row.id === id && dateInRange;
         });
         setFilteredData(filtered);
     };
@@ -44,7 +44,7 @@ const DetailPage = () => {
         return <Typography>Loading...</Typography>;
     }
 
-    const totalSum = filteredData.reduce((sum, row) => sum + parseFloat(row.Total || 0), 0);
+    const totalSum = filteredData.reduce((sum, row) => sum + parseFloat(row.total || 0), 0);
 
     return (
         <Container maxWidth="lg">
