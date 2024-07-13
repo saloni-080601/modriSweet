@@ -7,7 +7,6 @@ import Form from './Form'; // Make sure you have a Form component as shown previ
 
 const DetailPage = () => {
     const { id } = useParams();
-
     const [rowData, setRowData] = useState(null);
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
@@ -47,7 +46,7 @@ const DetailPage = () => {
     const handleDelete = async (rowId) => {
         try {
             await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/id/${rowId}`);
-            const updatedData = rowData.filter((row,index) => row.id !== rowId);
+            const updatedData = rowData.filter((row) => row.id !== rowId);
             setRowData(updatedData);
             setFilteredData(updatedData.filter((row) => row.id === id));
         } catch (error) {
