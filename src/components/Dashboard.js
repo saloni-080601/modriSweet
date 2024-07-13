@@ -78,7 +78,7 @@ const Dashboard = () => {
     );
 
     return (
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" style={{marginTop:"64px"}}>
             <Form 
                 open={open} 
                 setOpen={setOpen}

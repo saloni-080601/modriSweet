@@ -11,7 +11,7 @@ function App() {
     <div className='App' >
        <AppBar position="fixed" style={{background:"white"}}>
                 <Toolbar>
-                    <img src={require("./com-logo.png")} style={{width:"200px", height:"100px"}}/>
+                    <img src={require("./com-logo.jpg")} style={{width:"200px", height:"100px"}}/>
                 </Toolbar>
             </AppBar>
         <Router>

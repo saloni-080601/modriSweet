@@ -1,5 +1,4 @@
-// src/components/Form.js
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     TextField,
     Button,
@@ -14,36 +13,33 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    Card
+    Card,
+    FormHelperText
 } from '@mui/material';
 
-import axios from 'axios';
+const Form = ({
+    name,
+    setName,
+    contact,
+    setContact,
+    id,
+    setID,
+    quantity,
+    setQuantity,
+    total,
+    setTotal,
+    date,
+    setDate,
+    timeOfDay,
+    setTimeOfDay,
+    open,
+    setOpen,
+    handleSubmit,
+    data
+}) => {
+    const [errors, setErrors] = useState({});
 
-const Form = (
-    {
-        name,
-        setName,
-        contact,
-        setContact,
-        id,
-        setID,
-        quantity,
-        setQuantity,
-        total,
-        setTotal,
-        date,
-        setDate,
-        timeOfDay,
-        setTimeOfDay,
-        open,
-        setOpen,
-        handleSubmit,
-        data
-    
-    }
-) => {
     useEffect(() => {
-        // Find the entry corresponding to the entered ID
         const selectedData = data.find(item => item.id === id);
         if (selectedData) {
             setName(selectedData.name);
@@ -62,27 +58,51 @@ const Form = (
         setOpen(false);
     };
 
+    const validate = () => {
+        let tempErrors = {};
+        if (!id || isNaN(id)) tempErrors.id = "Valid ID is required";
+        if (!name) tempErrors.name = "Name is required";
+        if (!contact || !/^\d{10}$/.test(contact)) tempErrors.contact = "Contact must be a 10-digit number";
+        if (!quantity || isNaN(quantity) || quantity <= 0) tempErrors.quantity = "Valid quantity is required";
+        if (!total || isNaN(total) || total <= 0) tempErrors.total = "Valid total is required";
+        if (!date) tempErrors.date = "Date is required";
+        if (!timeOfDay) tempErrors.timeOfDay = "Time of day is required";
+
+        setErrors(tempErrors);
+        return Object.keys(tempErrors).length === 0;
+    };
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+        if (validate()) {
+            handleSubmit();
+            handleClose();
+        }
+    };
+
     return (
-        <Container style={{margin:"64px 0px"}}>
-            <Card sx={{padding:"32px", display:"flex", justifyContent:"space-between"}}>
-            <Typography variant="body1" align="center" gutterBottom>
-                If you want to Fill the Form to add quantity of product
-            </Typography>
-            <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-                Open Form
-            </Button>
+        <Container style={{ margin: "80px 0px" }}>
+            <Card sx={{ padding: "32px", display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="body1" align="center" gutterBottom>
+                    If you want to Fill the Form to add quantity of product
+                </Typography>
+                <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+                    Open Form
+                </Button>
             </Card>
-           
+
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Submit Form</DialogTitle>
                 <DialogContent>
-                    <form onSubmit={handleSubmit}>
-                    <TextField
+                    <form onSubmit={onSubmit}>
+                        <TextField
                             label="Id"
                             value={id}
                             onChange={(e) => setID(e.target.value)}
                             fullWidth
                             margin="normal"
+                            error={!!errors.id}
+                            helperText={errors.id}
                         />
                         <TextField
                             label="Name"
@@ -90,6 +110,8 @@ const Form = (
                             onChange={(e) => setName(e.target.value)}
                             fullWidth
                             margin="normal"
+                            error={!!errors.name}
+                            helperText={errors.name}
                         />
                         <TextField
                             label="Contact"
@@ -97,14 +119,17 @@ const Form = (
                             onChange={(e) => setContact(e.target.value)}
                             fullWidth
                             margin="normal"
+                            error={!!errors.contact}
+                            helperText={errors.contact}
                         />
-                       
                         <TextField
                             label="Quantity"
                             value={quantity}
                             onChange={(e) => setQuantity(e.target.value)}
                             fullWidth
                             margin="normal"
+                            error={!!errors.quantity}
+                            helperText={errors.quantity}
                         />
                         <TextField
                             label="Total"
@@ -112,6 +137,8 @@ const Form = (
                             onChange={(e) => setTotal(e.target.value)}
                             fullWidth
                             margin="normal"
+                            error={!!errors.total}
+                            helperText={errors.total}
                         />
                         <TextField
                             label="Date"
@@ -124,8 +151,10 @@ const Form = (
                             InputLabelProps={{
                                 shrink: true,
                             }}
+                            error={!!errors.date}
+                            helperText={errors.date}
                         />
-                        <FormControl fullWidth margin="normal" variant="outlined">
+                        <FormControl fullWidth margin="normal" variant="outlined" error={!!errors.timeOfDay}>
                             <InputLabel>Time of Day</InputLabel>
                             <Select
                                 value={timeOfDay}
@@ -135,6 +164,7 @@ const Form = (
                                 <MenuItem value="Morning">Morning</MenuItem>
                                 <MenuItem value="Evening">Evening</MenuItem>
                             </Select>
+                            <FormHelperText>{errors.timeOfDay}</FormHelperText>
                         </FormControl>
                         <DialogActions>
                             <Button onClick={handleClose} color="primary">
