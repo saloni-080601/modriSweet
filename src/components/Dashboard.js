@@ -51,9 +51,18 @@ const Dashboard = () => {
         fetchData();
     }, []);
     
-    const handleSubmit = async (formData) => {
+    const handleSubmit = async () => {
        
-        
+        const formData = {
+            name,
+            contact,
+            id,
+            quantity,
+            total,
+            date,
+            timeOfDay,
+            userId
+        }
         try {
             const response = await fetch('https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25', {
                 method: 'POST',
