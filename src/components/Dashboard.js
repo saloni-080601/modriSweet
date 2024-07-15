@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Table, TableBody, TableCell, TableHead, TableRow, Typography, Box } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableHead, TableRow, Typography, Box, Paper } from '@mui/material';
 import axios from 'axios';
 import SearchBar from './SearchBar';
 import { Link } from 'react-router-dom';
@@ -16,56 +16,68 @@ const Dashboard = () => {
     const [date, setDate] = useState('');
     const [timeOfDay, setTimeOfDay] = useState('');
     const [open, setOpen] = useState(false);
+    const [userId,setUserId]=useState("");
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const formData = { name, contact, id, quantity, total, date, timeOfDay };
-        try {
-            const response = await fetch("https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-            await response.json();
-            setName('');
-            setContact('');
-            setQuantity('');
-            setID('');
-            setTotal('');
-            setDate('');
-            setTimeOfDay('');
-            setOpen(false); // Close the dialog after submitting
-        } catch (error) {
-            console.error('Error submitting the form', error);
-        }
-    };
+    
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get('https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25');
                 const fetchedData = response.data;
-
+    
                 // Remove duplicate IDs
                 const seenIds = new Set();
                 const uniqueData = [];
-
+                let maxId = 0; // Initialize maxId
+    
                 fetchedData.forEach(item => {
-                    if (!seenIds.has(item.id)) {
-                        seenIds.add(item.id);
+                    if (!seenIds.has(item.userId)) {
+                        seenIds.add(item.userId);
                         uniqueData.push(item);
+    
+                        // Determine the maximum id
+                        
                     }
+                    maxId=item.id;
                 });
-
+                console.log(maxId+1)
                 setData(uniqueData);
+                setID(parseInt(maxId) + 1); // Set the next id for the new entry
             } catch (error) {
                 console.error('Error fetching data', error);
             }
         };
         fetchData();
     }, []);
+    
+    const handleSubmit = async (formData) => {
+       
+        
+        try {
+            const response = await fetch('https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+        
+            if (response.ok) {
+                console.log('Form submitted successfully');
+                // Reset form or show success message here
+            } else {
+                console.error('Failed to submit form');
+                // Handle server errors
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            // Handle client-side errors
+        }
+    };
+    
+
+   
 
     const handleSearch = (query) => {
         setSearchQuery(query);
@@ -74,11 +86,11 @@ const Dashboard = () => {
     // Filter data based on search query
     const filteredData = data.filter(item =>
         (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (item.id && item.id.toString().includes(searchQuery))
+        (item.userId && item.userId.toString().includes(searchQuery))
     );
 
     return (
-        <Container maxWidth="lg" style={{marginTop:"64px"}}>
+        <Container maxWidth="lg" style={{marginTop:"120px"}}>
             <Form 
                 open={open} 
                 setOpen={setOpen}
@@ -98,12 +110,15 @@ const Dashboard = () => {
                 timeOfDay={timeOfDay} 
                 setTimeOfDay={setTimeOfDay}
                 data={data}
+                userId={userId}
+                setUserId={setUserId}
             />
             <Box my={4}>
                 <Typography variant="h4" component="h1" gutterBottom>
                     Dashboard
                 </Typography>
                 <SearchBar onSearch={handleSearch} />
+                <Paper elevation={3}>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -115,15 +130,16 @@ const Dashboard = () => {
                     </TableHead>
                     <TableBody>
                         {filteredData.map((row, index) => (
-                            <TableRow key={index} component={Link} to={`/detail/${row.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <TableRow key={index} component={Link} to={`/detail/${row.userId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <TableCell>{row.name}</TableCell>
                                 <TableCell>{row.contact}</TableCell>
-                                <TableCell>{row.id}</TableCell>
+                                <TableCell>{row.userId}</TableCell>
                                 
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
+                </Paper>
             </Box>
         </Container>
     );

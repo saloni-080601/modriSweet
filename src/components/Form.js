@@ -35,12 +35,14 @@ const Form = ({
     open,
     setOpen,
     handleSubmit,
-    data
+    data,
+    userId,
+    setUserId
 }) => {
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        const selectedData = data.find(item => item.id === id);
+        const selectedData = data.find(item => item.userId === userId);
         if (selectedData) {
             setName(selectedData.name);
             setContact(selectedData.contact);
@@ -48,7 +50,7 @@ const Form = ({
             setName('');
             setContact('');
         }
-    }, [id, data]);
+    }, [userId, data]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -60,7 +62,7 @@ const Form = ({
 
     const validate = () => {
         let tempErrors = {};
-        if (!id || isNaN(id)) tempErrors.id = "Valid ID is required";
+        if (!userId || isNaN(userId)) tempErrors.userId = "Valid ID is required";
         if (!name) tempErrors.name = "Name is required";
         if (!contact || !/^\d{10}$/.test(contact)) tempErrors.contact = "Contact must be a 10-digit number";
         if (!quantity || isNaN(quantity) || quantity <= 0) tempErrors.quantity = "Valid quantity is required";
@@ -71,11 +73,21 @@ const Form = ({
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
     };
+    const formData = {
+        id, // This will now be the next available id
+        name,
+        contact,
+        quantity,
+        total,
+        date,
+        timeOfDay,
+        userId
+    };
 
     const onSubmit = (e) => {
-        e.preventDefault();
+        
         if (validate()) {
-            handleSubmit();
+            handleSubmit(formData);
             handleClose();
         }
     };
@@ -97,12 +109,12 @@ const Form = ({
                     <form onSubmit={onSubmit}>
                         <TextField
                             label="Id"
-                            value={id}
-                            onChange={(e) => setID(e.target.value)}
+                            value={userId}
+                            onChange={(e) => setUserId(e.target.value)}
                             fullWidth
                             margin="normal"
-                            error={!!errors.id}
-                            helperText={errors.id}
+                            error={!!errors.userId}
+                            helperText={errors.userId}
                         />
                         <TextField
                             label="Name"
