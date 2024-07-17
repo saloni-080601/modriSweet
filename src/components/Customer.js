@@ -46,7 +46,7 @@ const Customer = () => {
                     <TextField 
                         variant="standard"
                          placeholder="Search..."
-                        style={{width:"50%"}}
+                        style={{width:"40%"}}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         InputProps={{
