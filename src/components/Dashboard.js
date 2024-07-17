@@ -3,28 +3,14 @@ import {
     Container, Table, TableBody, TableCell, TableHead, TableRow, Typography, Box, Paper,
     TablePagination, Toolbar, Button
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import axios from 'axios';
 import SearchBar from './SearchBar';
 import { useNavigate } from 'react-router-dom';
 import Form from './Form';
 import { Edit, Delete } from '@mui/icons-material';
 
-const useStyles = makeStyles((theme) => ({
-    container: {
-        marginTop: "120px",
-    },
-    paper: {
-        marginTop: "32px",
-        padding: "16px",
-    },
-    table: {
-        minWidth: 650,
-    },
-}));
 
 const Dashboard = () => {
-    const classes = useStyles();
     const navigate = useNavigate();
     const [data, setData] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -170,7 +156,7 @@ const Dashboard = () => {
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     return (
-        <Container maxWidth="lg" className={classes.container}>
+        <Container maxWidth="lg" style={{marginTop:"120px"}}>
             <Form
                 open={open}
                 setOpen={setOpen}
@@ -188,7 +174,7 @@ const Dashboard = () => {
                 <Typography variant="h4" component="h1" gutterBottom align='left'>
                     Dashboard
                 </Typography>
-                <Paper elevation={4} className={classes.paper}>
+                <Paper elevation={4} style={{marginTop: "32px",padding: "16px",}}>
                     <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <SearchBar onSearch={handleSearch} />
                         <TablePagination
@@ -201,7 +187,7 @@ const Dashboard = () => {
                             onRowsPerPageChange={handleChangeRowsPerPage}
                         />
                     </Toolbar>
-                    <Table className={classes.table}>
+                    <Table style={{minWidth:"650px"}}>
                         <TableHead>
                             <TableRow>
                                 <TableCell></TableCell>
