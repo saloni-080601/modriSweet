@@ -1,143 +1,149 @@
-import React, { useState, useEffect } from 'react';
-import {
-    TextField,
-    Button,
-    Container,
-    Box,
-    Typography,
-    Select,
-    MenuItem,
-    InputLabel,
-    FormControl,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Card,
-    FormHelperText
+import React, { useEffect, useState } from 'react';
+import { 
+    Container, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Card, FormControl, InputLabel, Select, MenuItem, FormHelperText 
 } from '@mui/material';
 
 const Form = ({
-    name,
-    setName,
-    contact,
-    setContact,
-    id,
-    setID,
-    quantity,
-    setQuantity,
-    total,
-    setTotal,
-    date,
-    setDate,
-    timeOfDay,
-    setTimeOfDay,
+    formState,
+    setFormState,
     open,
     setOpen,
     handleSubmit,
+    isEdit,
+    setIsEdit,
     data,
-    userId,
-    setUserId
+    formOpen,
+    setFormOpen
+
 }) => {
     const [errors, setErrors] = useState({});
+    const [defaulted,setDefulted] = useState(false)
 
     useEffect(() => {
-        const selectedData = data.find(item => item.userId === userId);
-        if (selectedData) {
-            setName(selectedData.name);
-            setContact(selectedData.contact);
-        } else {
-            setName('');
-            setContact('');
+        if (!isEdit) {
+            setFormState({
+                name: '',
+                contact: '',
+                quantity: '',
+                id: '',
+                total: '',
+                date: '',
+                timeOfDay: '',
+                userId: ''
+            });
         }
-    }, [userId, data]);
+    }, [open, isEdit, setFormState]);
+
+    const validate = () => {
+        let tempErrors = {};
+        if (!formState.userId || isNaN(formState.userId)) tempErrors.userId = "Valid ID is required";
+        if (!formState.name) tempErrors.name = "Name is required";
+        if (!formState.contact || !/^\d{10}$/.test(formState.contact)) tempErrors.contact = "Contact must be a 10-digit number";
+        if (!formState.quantity || isNaN(formState.quantity) || formState.quantity <= 0) tempErrors.quantity = "Valid quantity is required";
+        if (!formState.total || isNaN(formState.total) || formState.total <= 0) tempErrors.total = "Valid total is required";
+        if (!formState.date) tempErrors.date = "Date is required";
+        if (!formState.timeOfDay) tempErrors.timeOfDay = "Time of day is required";
+
+        setErrors(tempErrors);
+        return Object.keys(tempErrors).length === 0;
+    };
+
+    useEffect(() => {
+        const selectedData = data.find(item => item.userId === formState.userId);
+      
+        if (selectedData) {
+            setFormState(prevState => ({ ...prevState, name: selectedData.name, contact:selectedData.contact }));
+            setDefulted(true)
+        } else {
+           setDefulted(false)
+        }
+    },[formState.userId])
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormState(prevState => ({ ...prevState, [name]: value }));
+    };
 
     const handleClickOpen = () => {
         setOpen(true);
     };
 
     const handleClose = () => {
+        setIsEdit(false);
         setOpen(false);
     };
 
-    const validate = () => {
-        let tempErrors = {};
-        if (!userId || isNaN(userId)) tempErrors.userId = "Valid ID is required";
-        if (!name) tempErrors.name = "Name is required";
-        if (!contact || !/^\d{10}$/.test(contact)) tempErrors.contact = "Contact must be a 10-digit number";
-        if (!quantity || isNaN(quantity) || quantity <= 0) tempErrors.quantity = "Valid quantity is required";
-        if (!total || isNaN(total) || total <= 0) tempErrors.total = "Valid total is required";
-        if (!date) tempErrors.date = "Date is required";
-        if (!timeOfDay) tempErrors.timeOfDay = "Time of day is required";
-
-        setErrors(tempErrors);
-        return Object.keys(tempErrors).length === 0;
-    };
-    const formData = {
-        id, // This will now be the next available id
-        name,
-        contact,
-        quantity,
-        total,
-        date,
-        timeOfDay,
-        userId
-    };
 
     const onSubmit = (e) => {
-        
+        e.preventDefault();
         if (validate()) {
-            handleSubmit(formData);
+            handleSubmit();
             handleClose();
         }
     };
+    console.log(formOpen)
 
     return (
-        <Container style={{ margin: "80px 0px" }}>
+        <Container style={{ margin: "80px 0px"}}>
             <Card sx={{ padding: "32px", display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body1" align="center" gutterBottom>
                     If you want to Fill the Form to add quantity of product
                 </Typography>
-                <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+                <Button variant="outlined" onClick={handleClickOpen} 
+                sx={{border:"1px solid #B11226", color:"#B11226"}}>
                     Open Form
                 </Button>
             </Card>
 
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Submit Form</DialogTitle>
+            <Dialog open={open} onClose={handleClose} style={{padding:"60px"}}>
+                <DialogTitle>
+                    {isEdit ? <Typography variant='h4'>Edit Form</Typography> : <Typography variant='h4'>Submit Form</Typography>}
+                </DialogTitle>
                 <DialogContent>
                     <form onSubmit={onSubmit}>
+                        {( (isEdit && formOpen==="editId") || !isEdit)&&
+                        <>
                         <TextField
-                            label="Id"
-                            value={userId}
-                            onChange={(e) => setUserId(e.target.value)}
+                            label="ID"
+                            name="userId"
+                            value={formState.userId}
+                            onChange={handleChange}
                             fullWidth
                             margin="normal"
                             error={!!errors.userId}
                             helperText={errors.userId}
-                        />
+                            />
                         <TextField
                             label="Name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            name="name"
+                            value={formState.name}
+                            onChange={handleChange}
                             fullWidth
                             margin="normal"
                             error={!!errors.name}
                             helperText={errors.name}
+                            disabled={!isEdit && defaulted}
                         />
                         <TextField
                             label="Contact"
-                            value={contact}
-                            onChange={(e) => setContact(e.target.value)}
+                            name="contact"
+                            value={formState.contact}
+                            onChange={handleChange}
                             fullWidth
                             margin="normal"
                             error={!!errors.contact}
                             helperText={errors.contact}
+                            disabled={!isEdit && defaulted}
                         />
+                        </>
+                        }
+                         {((isEdit && formOpen==="edituserId") || !isEdit) &&
+                        <>
                         <TextField
                             label="Quantity"
-                            value={quantity}
-                            onChange={(e) => setQuantity(e.target.value)}
+                            name="quantity"
+                            value={formState.quantity}
+                            onChange={handleChange}
                             fullWidth
                             margin="normal"
                             error={!!errors.quantity}
@@ -145,8 +151,9 @@ const Form = ({
                         />
                         <TextField
                             label="Total"
-                            value={total}
-                            onChange={(e) => setTotal(e.target.value)}
+                            name="total"
+                            value={formState.total}
+                            onChange={handleChange}
                             fullWidth
                             margin="normal"
                             error={!!errors.total}
@@ -155,8 +162,9 @@ const Form = ({
                         <TextField
                             label="Date"
                             type="date"
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
+                            name="date"
+                            value={formState.date}
+                            onChange={handleChange}
                             fullWidth
                             margin="normal"
                             variant="outlined"
@@ -169,8 +177,9 @@ const Form = ({
                         <FormControl fullWidth margin="normal" variant="outlined" error={!!errors.timeOfDay}>
                             <InputLabel>Time of Day</InputLabel>
                             <Select
-                                value={timeOfDay}
-                                onChange={(e) => setTimeOfDay(e.target.value)}
+                                name="timeOfDay"
+                                value={formState.timeOfDay}
+                                onChange={handleChange}
                                 label="Time of Day"
                             >
                                 <MenuItem value="Morning">Morning</MenuItem>
@@ -178,11 +187,13 @@ const Form = ({
                             </Select>
                             <FormHelperText>{errors.timeOfDay}</FormHelperText>
                         </FormControl>
+                        </>
+                        }
                         <DialogActions>
-                            <Button onClick={handleClose} color="primary">
+                            <Button onClick={handleClose} sx={{color:"#B11226"}}>
                                 Cancel
                             </Button>
-                            <Button type="submit" variant="contained" color="primary">
+                            <Button type="submit" variant="contained" color="primary" style={{background:"#B11226"}}>
                                 Submit
                             </Button>
                         </DialogActions>
@@ -194,4 +205,5 @@ const Form = ({
 };
 
 export default Form;
+
 

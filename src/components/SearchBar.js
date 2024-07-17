@@ -12,7 +12,7 @@ const SearchBar = ({ onSearch }) => {
 
   return (
     <TextField
-      variant="outlined"
+      variant="standard"
       placeholder="Search..."
       onChange={handleSearchChange}
       InputProps={{
@@ -22,7 +22,7 @@ const SearchBar = ({ onSearch }) => {
           </InputAdornment>
         ),
       }}
-      fullWidth
+     
     />
   );
 };

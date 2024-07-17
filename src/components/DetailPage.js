@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Container, Typography, Box, Table, TableBody, TableCell, TableHead, TableRow, TextField, Button, IconButton, Grid, Paper } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import axios from 'axios';
-import Form from './Form'; // Make sure you have a Form component as shown previously
+import Form from './Form'; // Ensure you have a Form component
 
 const DetailPage = () => {
     const { id } = useParams();
@@ -12,10 +12,19 @@ const DetailPage = () => {
     const [toDate, setToDate] = useState('');
     const [filteredData, setFilteredData] = useState(null);
     const [editData, setEditData] = useState(null);
-    const [editIndex, setEditIndex] = useState(null);
     const [open, setOpen] = useState(false);
-
-
+    const [isEdit, setIsEdit] = useState(false);
+    const [formOpen, setFormOpen] = useState("main");
+    const [formState, setFormState] = useState({
+        name: '',
+        contact: '',
+        id: '',
+        quantity: '',
+        total: '',
+        date: '',
+        timeOfDay: '',
+        userId: ''
+    });
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -41,9 +50,10 @@ const DetailPage = () => {
         setFilteredData(filtered);
     };
 
-    const handleEdit = (row, index) => {
-        setEditData(row);
-        setEditIndex(index);
+    const handleEdit = (row) => {
+        setFormOpen("edituserId");
+        setIsEdit(true);   
+        setFormState(row);  // Ensure form state is populated with the selected row's data
         setOpen(true);
     };
 
@@ -56,9 +66,12 @@ const DetailPage = () => {
         }
     };
 
-    const handleFormSubmit = async (formData) => {
+    const handleFormSubmit = async () => {
+        const { name, contact, id, quantity, total, date, timeOfDay, userId } = formState;
+        const formData = { name, contact, id, quantity, total, date, timeOfDay, userId };
+        console.log(formData);
+        
         try {
-            // Assuming the API supports batch update for updates
             await axios.put(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/id/${formData.id}`, formData);
             window.location.reload();
         } catch (error) {
@@ -75,7 +88,6 @@ const DetailPage = () => {
     return (
         <Container maxWidth="lg" style={{ marginTop: "120px" }}>
             <Box my={4}>
-               
                 <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: "80px" }}>
                     User Details
                 </Typography>
@@ -107,12 +119,12 @@ const DetailPage = () => {
                         </Grid>
                         <Grid item xs={12} sm={12} md={2}>
                             <Button 
-                            fullWidth
-                            style={{padding:"16px"}}
-                            padding="100px"
-                            variant="contained"
-                             color="primary" 
-                             onClick={handleFilter}>
+                                fullWidth
+                                style={{ padding: "16px" }}
+                                variant="contained"
+                                color="primary"
+                                onClick={handleFilter}
+                            >
                                 Filter
                             </Button>
                         </Grid>
@@ -124,7 +136,7 @@ const DetailPage = () => {
                             <TableRow>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Contact</TableCell>
-                                <TableCell>Id</TableCell>
+                                <TableCell>ID</TableCell>
                                 <TableCell>Quantity</TableCell>
                                 <TableCell>Date</TableCell>
                                 <TableCell>Time</TableCell>
@@ -143,7 +155,7 @@ const DetailPage = () => {
                                     <TableCell>{row.timeOfDay}</TableCell>
                                     <TableCell>{row.total}</TableCell>
                                     <TableCell>
-                                        <IconButton onClick={() => handleEdit(row, index)}>
+                                        <IconButton onClick={() => handleEdit(row)}>
                                             <Edit />
                                         </IconButton>
                                         <IconButton onClick={() => handleDelete(row)}>
@@ -161,28 +173,18 @@ const DetailPage = () => {
                     </Table>
                 </Paper>
             </Box>
-            {editData && (
+            {isEdit && (
                 <Form
+                    formState={formState}
+                    setFormState={setFormState}
                     open={open}
                     setOpen={setOpen}
                     handleSubmit={handleFormSubmit}
-                    name={editData.name}
-                    setName={(name) => setEditData({ ...editData, name })}
-                    contact={editData.contact}
-                    setContact={(contact) => setEditData({ ...editData, contact })}
-                    id={editData.id}
-                    userId={editData.userId}
-                    setUserId={(userId)=> setEditData({...editData,userId})}
-                    setID={(id) => setEditData({ ...editData, id })}
-                    quantity={editData.quantity}
-                    setQuantity={(quantity) => setEditData({ ...editData, quantity })}
-                    total={editData.total}
-                    setTotal={(total) => setEditData({ ...editData, total })}
-                    date={editData.date}
-                    setDate={(date) => setEditData({ ...editData, date })}
-                    timeOfDay={editData.timeOfDay}
-                    setTimeOfDay={(timeOfDay) => setEditData({ ...editData, timeOfDay })}
+                    isEdit={isEdit}
+                    setIsEdit={setIsEdit}
                     data={rowData}
+                    formOpen={formOpen}
+                    setFormOpen={setFormOpen}
                 />
             )}
         </Container>
@@ -190,4 +192,3 @@ const DetailPage = () => {
 };
 
 export default DetailPage;
-
