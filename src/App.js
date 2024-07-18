@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DetailPage from './components/DetailPage';
 import { AppBar, Button, Toolbar, Typography } from '@mui/material';
 import shoploog from './icemodri.svg'
-import Customer from './components/Customer';
+import Customer from "./components/Customer"
 
 function App() {
   return (

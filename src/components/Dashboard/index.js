@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import {
-    Container, Table, TableBody, TableCell, TableHead, TableRow, Typography, Box, Paper,
-    TablePagination, Toolbar, Button
-} from '@mui/material';
+import { Container, 
+    Box, 
+    Typography, 
+    Paper, 
+    Toolbar, 
+    Table, 
+    TableBody, 
+    TableCell, 
+    TableHead, 
+    TableRow, 
+    TableSortLabel, 
+    Button, 
+    TablePagination, 
+    useMediaQuery,
+    Grid} from '@mui/material';
 import axios from 'axios';
 import SearchBar from './SearchBar';
 import { useNavigate } from 'react-router-dom';
-import Form from './Form';
+import Form from '../Form';
 import { Edit, Delete } from '@mui/icons-material';
+import './style.css';
 
 
 const Dashboard = () => {
@@ -29,6 +41,8 @@ const Dashboard = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [isEdit, setIsEdit] = useState(false);
     const [formOpen, setFormOpen] = useState("main");
+    const [sheetData, setSheetData] = useState([]);
+    const [order, setOrder] = useState('asc');
 
     useEffect(() => {
         fetchData();
@@ -57,17 +71,24 @@ const Dashboard = () => {
         }
     };
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet');
+                setSheetData(response.data);
+            } catch (error) {
+                console.error('Error fetching data', error);
+            }
+        }
+       fetchData();
+    },[]);
+
     const handleSubmit = async () => {
         const { name, contact, id, quantity, total, date, timeOfDay, userId } = formState;
         const formData = { name, contact, id, quantity, total, date, timeOfDay, userId };
 
         try {
-            // Fetch data from sheet2 to check if the user exists
-            const response = await axios.get('https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet');
-            const sheet2Data = response.data;
-
-            // Check if the user already exists in sheet2
-            const userExistsInSheet2 = sheet2Data.some(item => item.userId === userId);
+            const userExistsInSheet2 = sheetData.some(item => item.userId === userId);
 
             if (!userExistsInSheet2) {
                 // If the user does not exist in sheet2, proceed with posting the data
@@ -152,11 +173,25 @@ const Dashboard = () => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
+    const handleSort = () => {
+        const isAsc = order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        const sortedData = [...data].sort((a, b) => {
+            if (isAsc) {
+                return a.userId - b.userId;
+            } else {
+                return b.userId - a.userId;
+            }
+        });
+        setData(sortedData);
+    };
 
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
+    const isSmallScreen = useMediaQuery('(max-width:600px)');
+
     return (
-        <Container maxWidth="lg" style={{marginTop:"120px"}}>
+        <Container maxWidth="lg" style={{ marginTop: "140px" }}>
             <Form
                 open={open}
                 setOpen={setOpen}
@@ -165,18 +200,26 @@ const Dashboard = () => {
                 setFormState={setFormState}
                 isEdit={isEdit}
                 setIsEdit={setIsEdit}
-                data={data}
+                data={sheetData}
                 setFormOpen={setFormOpen}
                 formOpen={formOpen}
             />
 
             <Box my={4}>
-                <Typography variant="h4" component="h1" gutterBottom align='left'>
+                <Typography 
+                variant="h4" 
+                component="h1" 
+                gutterBottom 
+                align='left' 
+                ml={2}
+                >
                     Dashboard
                 </Typography>
-                <Paper elevation={4} style={{marginTop: "32px",padding: "16px",}}>
-                    <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <SearchBar onSearch={handleSearch} />
+                <Paper elevation={4} style={{ marginTop: "16px", padding: "32px", }}>
+                
+                    <Grid container spacing={2} style={{padding:"16px"}}>
+                        <Grid  item xs={12} sm={6} md={6} align="left" ><SearchBar onSearch={handleSearch} /></Grid>
+                        <Grid item xs={12} sm={6} md={6} >
                         <TablePagination
                             rowsPerPageOptions={[5, 10, 25]}
                             component="div"
@@ -186,15 +229,27 @@ const Dashboard = () => {
                             onPageChange={handleChangePage}
                             onRowsPerPageChange={handleChangeRowsPerPage}
                         />
-                    </Toolbar>
-                    <Table style={{minWidth:"650px"}}>
+                        </Grid>
+                    </Grid>
+                    
+                        
+                
+                    <Table className={isSmallScreen ? 'responsive-table' : ''}>
                         <TableHead>
                             <TableRow>
-                                <TableCell></TableCell>
-                                <TableCell><strong>Name</strong></TableCell>
-                                <TableCell><strong>Contact</strong></TableCell>
-                                <TableCell><strong>ID</strong></TableCell>
-                                <TableCell align='right' style={{paddingLeft:"18px"}}><strong>Actions</strong></TableCell>
+                                <TableCell className='table-headcell'></TableCell>
+                                <TableCell className='table-headcell'><strong>Name</strong></TableCell>
+                                <TableCell className='table-headcell'><strong>Contact</strong></TableCell>
+                                <TableCell className='table-headcell'>
+                                    <TableSortLabel
+                                        active={true}
+                                        direction={order}
+                                        onClick={handleSort}
+                                    >
+                                        <strong>ID</strong>
+                                    </TableSortLabel>
+                                </TableCell>
+                                <TableCell align='right' style={{ paddingLeft: "18px" }}><strong>Actions</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -203,12 +258,13 @@ const Dashboard = () => {
                                     key={index}
                                     style={{ border: "1px", cursor: 'pointer' }}
                                     onClick={() => handleRowClick(row.userId)}
+                                    className='table-row'
                                 >
-                                    <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{row.name}</TableCell>
-                                    <TableCell>{row.contact}</TableCell>
-                                    <TableCell>{row.userId}</TableCell>
-                                    <TableCell align='right'>
+                                    <TableCell className='table-cell' data-label="Index">{index + 1}</TableCell>
+                                    <TableCell className='table-cell' data-label="Name">{row.name}</TableCell>
+                                    <TableCell className='table-cell' data-label="Contact">{row.contact}</TableCell>
+                                    <TableCell className='table-cell' data-label="ID">{row.userId}</TableCell>
+                                    <TableCell align='right' className='table-cell' data-label="Actions">
                                         <Button
                                             variant="contained"
                                             color="primary"

@@ -1,11 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Typography, Box, Table, TableBody, TableCell, TableHead, TableRow, TextField, Button, IconButton, Grid, Paper } from '@mui/material';
+import { Container, 
+    Typography, 
+    Box, 
+    Table, 
+    TableBody, 
+    TableCell, 
+    TableHead, 
+    TableRow, 
+    TextField, 
+    Button, 
+    IconButton, 
+    Grid, 
+    Paper,
+    useMediaQuery
+ } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import axios from 'axios';
-import Form from './Form'; // Ensure you have a Form component
+import Form from '../Form'; // Ensure you have a Form component
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
 const DetailPage = () => {
+    const isSmallScreen = useMediaQuery('(max-width:600px)');
+
     const { id } = useParams();
     const [rowData, setRowData] = useState(null);
     const [fromDate, setFromDate] = useState('');
@@ -25,6 +43,7 @@ const DetailPage = () => {
         timeOfDay: '',
         userId: ''
     });
+    const [sortOrder, setSortOrder] = useState('asc'); // State to keep track of sorting order
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -79,6 +98,25 @@ const DetailPage = () => {
         }
     };
 
+    const handleSort = () => {
+        const sortedData = [...filteredData].sort((a, b) => {
+            const dateA = a.date.split('/').reverse().join('-');
+            const dateB = b.date.split('/').reverse().join('-');
+            if (sortOrder === 'asc') {
+                return new Date(dateA) - new Date(dateB);
+            } else {
+                return new Date(dateB) - new Date(dateA);
+            }
+        });
+        setFilteredData(sortedData);
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    };
+
+    const formatDate = (dateStr) => {
+        const [year, month, day] = dateStr.split('-');
+        return `${day}/${month}/${year}`;
+    };
+
     if (!filteredData) {
         return <Typography>Loading...</Typography>;
     }
@@ -86,12 +124,17 @@ const DetailPage = () => {
     const totalSum = filteredData.reduce((sum, row) => sum + parseFloat(row.total || 0), 0);
 
     return (
-        <Container maxWidth="lg" style={{ marginTop: "120px" }}>
+        <Container maxWidth="lg" style={{ marginTop: "160px" }}>
             <Box my={4}>
-                <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: "80px" }}>
+                <Typography 
+                variant="h4"
+                component="h1" 
+                gutterBottom 
+                align='left'
+                style={{ margin:"40px 0px" }}>
                     User Details
                 </Typography>
-                <Box mb={2}>
+                <Box mb={4}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6} md={3}>
                             <TextField
@@ -128,33 +171,60 @@ const DetailPage = () => {
                                 Filter
                             </Button>
                         </Grid>
+                        <Grid item xs={12} sm={12} md={2}>
+                            <Button 
+                                fullWidth
+                                style={{ padding: "16px" }}
+                                variant="contained"
+                                color="secondary"
+                                onClick={handleSort}
+                            >
+                                Sort by Date {sortOrder === 'asc' ?  <ArrowDropUpIcon/>:<ArrowDropDownIcon/> }
+                            </Button>
+                        </Grid>
                     </Grid>
                 </Box>
-                <Paper>
-                    <Table>
+                <Paper elevation={2} style={{padding:"32px"}}>
+                    <Table  className={isSmallScreen ? 'responsive-table' : ''}>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Contact</TableCell>
-                                <TableCell>ID</TableCell>
-                                <TableCell>Quantity</TableCell>
-                                <TableCell>Date</TableCell>
-                                <TableCell>Time</TableCell>
-                                <TableCell>Total</TableCell>
-                                <TableCell>Actions</TableCell>
+                                <TableCell >
+                                    <strong>Name</strong>
+                                    </TableCell>
+                                <TableCell >
+                                    <strong>Contact</strong>
+                                    </TableCell>
+                                <TableCell>
+                                    <strong>ID</strong>
+                                    </TableCell>
+                                <TableCell>
+                                    <strong>Quantity</strong>
+                                    </TableCell>
+                                <TableCell>
+                                    <strong>Date</strong>
+                                    </TableCell>
+                                <TableCell>
+                                    <strong>Time</strong>
+                                    </TableCell>
+                                <TableCell>
+                                    <strong>Total</strong>
+                                    </TableCell>
+                                <TableCell>
+                                    <strong>Actions</strong>
+                                    </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {filteredData.map((row, index) => (
                                 <TableRow key={index}>
-                                    <TableCell>{row.name}</TableCell>
-                                    <TableCell>{row.contact}</TableCell>
-                                    <TableCell>{row.userId}</TableCell>
-                                    <TableCell>{row.quantity}</TableCell>
-                                    <TableCell>{row.date}</TableCell>
-                                    <TableCell>{row.timeOfDay}</TableCell>
-                                    <TableCell>{row.total}</TableCell>
-                                    <TableCell>
+                                    <TableCell  data-label="Name">{row.name}</TableCell>
+                                    <TableCell  data-label="Contact">{row.contact}</TableCell>
+                                    <TableCell data-label="UserId">{row.userId}</TableCell>
+                                    <TableCell data-label="Quantity">{row.quantity}</TableCell>
+                                    <TableCell data-label="Date">{formatDate(row.date)}</TableCell>
+                                    <TableCell data-label="Time">{row.timeOfDay}</TableCell>
+                                    <TableCell data-label="Total">{row.total}</TableCell>
+                                    <TableCell data-label="Action">
                                         <IconButton onClick={() => handleEdit(row)}>
                                             <Edit />
                                         </IconButton>
