@@ -188,6 +188,9 @@ const DetailPage = () => {
                     <Table  className={isSmallScreen ? 'responsive-table' : ''}>
                         <TableHead>
                             <TableRow>
+                            <TableCell >
+                                    
+                                    </TableCell>
                                 <TableCell >
                                     <strong>Name</strong>
                                     </TableCell>
@@ -217,6 +220,7 @@ const DetailPage = () => {
                         <TableBody>
                             {filteredData.map((row, index) => (
                                 <TableRow key={index}>
+                                    <TableCell data-label="Sno">{index+1}</TableCell>
                                     <TableCell  data-label="Name">{row.name}</TableCell>
                                     <TableCell  data-label="Contact">{row.contact}</TableCell>
                                     <TableCell data-label="UserId">{row.userId}</TableCell>
@@ -235,7 +239,7 @@ const DetailPage = () => {
                                 </TableRow>
                             ))}
                             <TableRow>
-                                <TableCell colSpan={6} align="right"><strong>Total Sum</strong></TableCell>
+                                <TableCell colSpan={7} align="right"><strong>Total Sum</strong></TableCell>
                                 <TableCell><strong>{totalSum.toFixed(2)}</strong></TableCell>
                                 <TableCell></TableCell>
                             </TableRow>

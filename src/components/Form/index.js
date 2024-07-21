@@ -17,48 +17,6 @@ const Form = ({
 
 }) => {
     const [errors, setErrors] = useState({});
-    const [defaulted, setDefaulted] = useState(false);
-
-    useEffect(() => {
-        if (!isEdit) {
-            setFormState({
-                name: '',
-                contact: '',
-                quantity: '',
-                id: '',
-                total: '',
-                date: '',
-                timeOfDay: '',
-                userId: ''
-            });
-        }
-    }, [open, isEdit, setFormState]);
-
-    const validate = () => {
-        let tempErrors = {};
-        if (!formState.userId || isNaN(formState.userId)) tempErrors.userId = "Valid ID is required";
-        if (!formState.name) tempErrors.name = "Name is required";
-        if (!formState.contact || !/^\d{10}$/.test(formState.contact)) tempErrors.contact = "Contact must be a 10-digit number";
-        if (!formState.quantity || isNaN(formState.quantity) || formState.quantity <= 0) tempErrors.quantity = "Valid quantity is required";
-        if (!formState.total || isNaN(formState.total) || formState.total <= 0) tempErrors.total = "Valid total is required";
-        if (!formState.date) tempErrors.date = "Date is required";
-        if (!formState.timeOfDay) tempErrors.timeOfDay = "Time of day is required";
-
-        setErrors(tempErrors);
-        return Object.keys(tempErrors).length === 0;
-    };
-
-    useEffect(() => {
-        const selectedData = data.find(item => item.userId === formState.userId);
-
-        if (selectedData) {
-            setFormState(prevState => ({ ...prevState, name: selectedData.name, contact: selectedData.contact }));
-            setDefaulted(true);
-        } else {
-            setDefaulted(false);
-            setFormState(prevState => ({ ...prevState, name: "", contact: "" }));
-        }
-    }, [formState.userId, data, setFormState]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -76,24 +34,13 @@ const Form = ({
 
     const onSubmit = (e) => {
         e.preventDefault();
-        if (validate()) {
-            handleSubmit();
-            handleClose();
-        }
+        handleSubmit();
+        handleClose();
+        
     };
 
     return (
         <Container style={{ margin: "80px 0" }}>
-            <Card sx={{ padding: "32px", display: "flex", justifyContent: "space-between", marginTop: "48px" }}>
-                <Typography variant="body1" align="center" gutterBottom>
-                    If you want to fill the form to add quantity of product
-                </Typography>
-                <Button variant="outlined" onClick={handleClickOpen}
-                    sx={{ border: "1px solid #B11226", color: "#B11226" }}>
-                    Open Form
-                </Button>
-            </Card>
-
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
                 <DialogTitle>
                     {isEdit ? <Typography variant='h4'>Edit Form</Typography> : <Typography variant='h4'>Submit Form</Typography>}
@@ -124,7 +71,7 @@ const Form = ({
                                         margin="normal"
                                         error={!!errors.name}
                                         helperText={errors.name}
-                                        disabled={!isEdit && defaulted}
+                                        
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
@@ -137,13 +84,25 @@ const Form = ({
                                         margin="normal"
                                         error={!!errors.contact}
                                         helperText={errors.contact}
-                                        disabled={!isEdit && defaulted}
+                                        
                                     />
                                 </Grid>
                             </Grid>
                         }
                         {((isEdit && formOpen === "edituserId") || !isEdit) &&
                             <Grid container spacing={2}>
+                                 <Grid item xs={12}>
+                                    <TextField
+                                        label="Price"
+                                        name="price"
+                                        value={formState.price}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        margin="normal"
+                                        error={!!errors.price}
+                                        helperText={errors.price}
+                                    />
+                                </Grid>
                                 <Grid item xs={12}>
                                     <TextField
                                         label="Quantity"

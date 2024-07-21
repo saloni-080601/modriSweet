@@ -48,6 +48,8 @@ const Dashboard = () => {
         fetchData();
     }, [formState.id]);
 
+
+
     const fetchData = async () => {
         try {
             const response = await axios.get('https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25');
@@ -70,6 +72,7 @@ const Dashboard = () => {
             console.error('Error fetching data', error);
         }
     };
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -83,29 +86,17 @@ const Dashboard = () => {
        fetchData();
     },[]);
 
+    
+
     const handleSubmit = async () => {
         const { name, contact, id, quantity, total, date, timeOfDay, userId } = formState;
         const formData = { name, contact, id, quantity, total, date, timeOfDay, userId };
 
         try {
-            const userExistsInSheet2 = sheetData.some(item => item.userId === userId);
-
-            if (!userExistsInSheet2) {
-                // If the user does not exist in sheet2, proceed with posting the data
-                const postResponse = await axios.post('https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet', formData);
-
-                if (postResponse.status === 200) {
-                    console.log('Data posted to sheet2 successfully');
-                } else {
-                    console.error('Failed to post data to sheet2');
-                }
-            } else {
-                console.log('User already exists in sheet2. Skipping the entry.');
-            }
-
+            
             // Post data to the original sheet
-            const responseOriginalSheet = await fetch(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25${isEdit ? `/userId/${formData.userId}` : ""}`, {
-                method: isEdit ? "PUT" : "POST",
+            const responseOriginalSheet = await fetch(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/userId/${formData.userId}`, {
+                method:"PUT",
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -192,6 +183,7 @@ const Dashboard = () => {
 
     return (
         <Container maxWidth="lg" style={{ marginTop: "140px" }}>
+            {isEdit &&
             <Form
                 open={open}
                 setOpen={setOpen}
@@ -204,6 +196,7 @@ const Dashboard = () => {
                 setFormOpen={setFormOpen}
                 formOpen={formOpen}
             />
+            }
 
             <Box my={4}>
                 <Typography 

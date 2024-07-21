@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import Form from './components/Form';
+import FormData from './components/Form/FormData';
 import Dashboard from './components/Dashboard';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DetailPage from './components/DetailPage';
@@ -18,12 +18,26 @@ function App() {
                 }}>
                     <img src={shoploog} alt="logo" style={{width:"200px",height:"100px",}}/>
                 </Toolbar>
+                <Toolbar>
+                <Button
+                variant="text" 
+                style={{ color:"black",
+                     cursor:"pointer",
+                     padding:"16px",
+                    borderRadius:"10px",
+                      }}
+                onClick={()=>{
+                    window.location.href="/dashboard"
+                }}
+                 >
+                   <strong> Dashboard </strong>
+                </Button>
                 <Button
                 variant="text" 
                 style={{ color:"black",
                      cursor:"pointer",
                      marginRight:"40px",
-                     padding:"32px",
+                     padding:"16px",
                     borderRadius:"10px",
                       }}
                 onClick={()=>{
@@ -32,11 +46,13 @@ function App() {
                  >
                    <strong> Customer </strong>
                 </Button>
+                </Toolbar>
                 </div>
             </AppBar>
         <Router>
             <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<FormData />} />
+                <Route  path='/dashboard' element={<Dashboard/>} />
                 <Route path="/customer" element={<Customer />} />
                 <Route path="/detail/:id" element={<DetailPage />} />
             </Routes>
