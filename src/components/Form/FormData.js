@@ -11,7 +11,6 @@ const FormData = () => {
         name: '',
         contact: '',
         quantity: '',
-        id: '',
         total: '',
         date: '',
         price: '',
@@ -63,7 +62,6 @@ const FormData = () => {
     useEffect(()=>{
        
         if ( formState.quantity || formState.price) {
-            console.log("ewfw")
             const newTotal = formState.price * formState.quantity;
             setFormState(prevState => ({ ...prevState, total: newTotal }));
         }
@@ -85,8 +83,8 @@ const FormData = () => {
     };
 
     const handleSubmit = async () => {
-        const { name, contact, id, quantity, price, total, date, timeOfDay, userId } = formState;
-        const formData = { name, contact, id, quantity, price, total, date, timeOfDay, userId };
+        const { name, contact, quantity, price, total, date, timeOfDay, userId } = formState;
+        const formData = { name, contact, quantity, price, total, date, timeOfDay, userId };
 
         try {
             const userExistsInSheet2 = sheetData.some(item => item.userId === userId);

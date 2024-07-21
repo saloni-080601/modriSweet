@@ -39,6 +39,14 @@ const Form = ({
         
     };
 
+    useEffect(()=>{
+       
+        if ( formState.quantity || formState.price) {
+            const newTotal = formState.price * formState.quantity;
+            setFormState(prevState => ({ ...prevState, total: newTotal }));
+        }
+    },[formState.quantity, formState.price]);
+
     return (
         <Container style={{ margin: "80px 0" }}>
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">

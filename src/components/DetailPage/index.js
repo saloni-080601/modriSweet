@@ -1,20 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, 
-    Typography, 
-    Box, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableHead, 
-    TableRow, 
-    TextField, 
-    Button, 
-    IconButton, 
-    Grid, 
-    Paper,
-    useMediaQuery
- } from '@mui/material';
+import { 
+    Container, Typography, Box, Table, TableBody, TableCell, TableHead, TableRow, 
+    TextField, Button, IconButton, Grid, Paper, useMediaQuery 
+} from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import axios from 'axios';
 import Form from '../Form'; // Ensure you have a Form component
@@ -23,20 +12,18 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 
 const DetailPage = () => {
     const isSmallScreen = useMediaQuery('(max-width:600px)');
-
     const { id } = useParams();
     const [rowData, setRowData] = useState(null);
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
     const [filteredData, setFilteredData] = useState(null);
-    const [editData, setEditData] = useState(null);
     const [open, setOpen] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [formOpen, setFormOpen] = useState("main");
     const [formState, setFormState] = useState({
         name: '',
         contact: '',
-        id: '',
+        price:'',
         quantity: '',
         total: '',
         date: '',
@@ -44,6 +31,7 @@ const DetailPage = () => {
         userId: ''
     });
     const [sortOrder, setSortOrder] = useState('asc'); // State to keep track of sorting order
+    const [editrow,setEditrow]=useState(null);
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -78,7 +66,7 @@ const DetailPage = () => {
 
     const handleDelete = async (row) => {
         try {
-            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/id/${row.id}` );
+            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/id/${row.id}`);
             window.location.reload();
         } catch (error) {
             console.error('Error deleting entry', error);
@@ -86,12 +74,10 @@ const DetailPage = () => {
     };
 
     const handleFormSubmit = async () => {
-        const { name, contact, id, quantity, total, date, timeOfDay, userId } = formState;
-        const formData = { name, contact, id, quantity, total, date, timeOfDay, userId };
-        console.log(formData);
-        
+        const { name, contact, quantity, total, date, timeOfDay, userId, price } = formState;
+        const formData = { name, contact, quantity, total, date, timeOfDay, userId, price };
         try {
-            await axios.put(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/id/${formData.id}`, formData);
+            await axios.put(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/id/${editrow.id}`, formData);
             window.location.reload();
         } catch (error) {
             console.error('Error updating entry', error);
@@ -127,11 +113,11 @@ const DetailPage = () => {
         <Container maxWidth="lg" style={{ marginTop: "160px" }}>
             <Box my={4}>
                 <Typography 
-                variant="h4"
-                component="h1" 
-                gutterBottom 
-                align='left'
-                style={{ margin:"40px 0px" }}>
+                    variant="h4"
+                    component="h1" 
+                    gutterBottom 
+                    align='left'
+                    style={{ margin:"40px 0px" }}>
                     User Details
                 </Typography>
                 <Box mb={4}>
@@ -179,57 +165,45 @@ const DetailPage = () => {
                                 color="secondary"
                                 onClick={handleSort}
                             >
-                                Sort by Date {sortOrder === 'asc' ?  <ArrowDropUpIcon/>:<ArrowDropDownIcon/> }
+                                Sort by Date {sortOrder === 'asc' ?  <ArrowDropUpIcon/> : <ArrowDropDownIcon/>}
                             </Button>
                         </Grid>
                     </Grid>
                 </Box>
                 <Paper elevation={2} style={{padding:"32px"}}>
-                    <Table  className={isSmallScreen ? 'responsive-table' : ''}>
+                    <Table className={isSmallScreen ? 'responsive-table' : ''}>
                         <TableHead>
                             <TableRow>
-                            <TableCell >
-                                    
-                                    </TableCell>
-                                <TableCell >
-                                    <strong>Name</strong>
-                                    </TableCell>
-                                <TableCell >
-                                    <strong>Contact</strong>
-                                    </TableCell>
-                                <TableCell>
-                                    <strong>ID</strong>
-                                    </TableCell>
-                                <TableCell>
-                                    <strong>Quantity</strong>
-                                    </TableCell>
-                                <TableCell>
-                                    <strong>Date</strong>
-                                    </TableCell>
-                                <TableCell>
-                                    <strong>Time</strong>
-                                    </TableCell>
-                                <TableCell>
-                                    <strong>Total</strong>
-                                    </TableCell>
-                                <TableCell>
-                                    <strong>Actions</strong>
-                                    </TableCell>
+                                <TableCell>Sno</TableCell>
+                                <TableCell><strong>Name</strong></TableCell>
+                                <TableCell><strong>Contact</strong></TableCell>
+                                <TableCell><strong>ID</strong></TableCell>
+                                <TableCell><strong>Price</strong></TableCell>
+                                <TableCell><strong>Quantity</strong></TableCell>
+                                <TableCell><strong>Date</strong></TableCell>
+                                <TableCell><strong>Time</strong></TableCell>
+                                <TableCell><strong>Total</strong></TableCell>
+                                <TableCell><strong>Actions</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {filteredData.map((row, index) => (
                                 <TableRow key={index}>
-                                    <TableCell data-label="Sno">{index+1}</TableCell>
-                                    <TableCell  data-label="Name">{row.name}</TableCell>
-                                    <TableCell  data-label="Contact">{row.contact}</TableCell>
+                                    <TableCell data-label="Sno">{index + 1}</TableCell>
+                                    <TableCell data-label="Name">{row.name}</TableCell>
+                                    <TableCell data-label="Contact">{row.contact}</TableCell>
                                     <TableCell data-label="UserId">{row.userId}</TableCell>
+                                    <TableCell data-label="Price">{row.price}</TableCell>
                                     <TableCell data-label="Quantity">{row.quantity}</TableCell>
+                                    
                                     <TableCell data-label="Date">{formatDate(row.date)}</TableCell>
                                     <TableCell data-label="Time">{row.timeOfDay}</TableCell>
                                     <TableCell data-label="Total">{row.total}</TableCell>
                                     <TableCell data-label="Action">
-                                        <IconButton onClick={() => handleEdit(row)}>
+                                        <IconButton onClick={() => {handleEdit(row);
+                                            setEditrow(row);
+                                        }
+                                        }>
                                             <Edit />
                                         </IconButton>
                                         <IconButton onClick={() => handleDelete(row)}>

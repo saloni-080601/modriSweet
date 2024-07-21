@@ -30,8 +30,8 @@ const Dashboard = () => {
         name: '',
         contact: '',
         quantity: '',
-        id: '',
         total: '',
+        price:'',
         date: '',
         timeOfDay: '',
         userId: ''
@@ -46,7 +46,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchData();
-    }, [formState.id]);
+    }, []);
 
 
 
@@ -64,10 +64,8 @@ const Dashboard = () => {
                     seenIds.add(item.userId);
                     uniqueData.push(item);
                 }
-                maxId = parseInt(item.id, 10);
             });
             setData(uniqueData);
-            setFormState(prevState => ({ ...prevState, id: maxId + 1 }));
         } catch (error) {
             console.error('Error fetching data', error);
         }
@@ -89,8 +87,8 @@ const Dashboard = () => {
     
 
     const handleSubmit = async () => {
-        const { name, contact, id, quantity, total, date, timeOfDay, userId } = formState;
-        const formData = { name, contact, id, quantity, total, date, timeOfDay, userId };
+        const { name, contact, quantity,price, total, date, timeOfDay, userId } = formState;
+        const formData = { name, contact, quantity,price, total, date, timeOfDay, userId };
 
         try {
             
@@ -120,7 +118,6 @@ const Dashboard = () => {
         setFormState({
             name: row.name,
             contact: row.contact,
-            id: row.id,
             quantity: row.quantity,
             total: row.total,
             date: row.date,
