@@ -35,6 +35,7 @@ const FormData = () => {
     });
     const [sheetData, setSheetData] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
+    const [buttonClicked, setButtonClicked] = useState(false); // Track if the button has been clicked
 
     useEffect(() => {
         const fetchData = async () => {
@@ -190,6 +191,7 @@ const FormData = () => {
             });
             setErrors({});
             setDefaulted(false);
+            setButtonClicked(false); // Reset button state after submission
 
             // Open dialog to show submission success
             setOpenDialog(true);
@@ -198,10 +200,11 @@ const FormData = () => {
             console.error('Error submitting form:', error);
         }
     };
- 
+
     const onSubmit = (e) => {
         e.preventDefault();
         if (validate()) {
+            setButtonClicked(true); // Set button as clicked
             handleSubmit();
         }
     };
@@ -211,142 +214,186 @@ const FormData = () => {
     };
 
     return (
-        <Container maxWidth="md" style={{ marginTop: "140px" }}>
-            <Paper elevation={3} style={{ padding: "32px", marginBottom:"120px"}}>
-            <Typography variant='h6' align='left' style={{ margin: "32px 0px 16px 0px" }}>Customer Form</Typography>
-            <form onSubmit={onSubmit}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="ID"
-                            name="userId"
-                            value={formState.userId}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            fullWidth
-                            margin="normal"
-                            error={!!errors.userId}
-                            helperText={errors.userId}
-                        />
+        <Container maxWidth style={{ marginTop: "105px" }}>
+            <Grid container >
+
+                
+                    <Grid item md={6} >
+                        <Grid container>
+                            <Grid item md={6}>
+                            <Paper>
+                                <img src={require("../assert/Coffee.jpg")} style={{ width: '100%' }} />
+                            </Paper>
+                            </Grid>
+                            <Grid item md={6}>
+                            <Paper>
+                                <img src={require("../assert/IceCream.jpg")} style={{ width: '100%' }} />
+                            </Paper>
+                            </Grid>
+                            <Grid item md={6}>
+                            <Paper>
+                                <img src={require("../assert/Cake.jpg")} style={{ width: '100%' }} />
+                            </Paper>
+                            </Grid>
+                            <Grid item md={6}>
+                            <Paper>
+                                <img src={require("../assert/IndiaSweet.jpg")} style={{ width: '100%', height:'450px'}} />
+                            </Paper>
+                            </Grid>
+                            <Grid item md={6}>
+                            <Paper>
+                                <img src={require("../assert/bread.jpg")} style={{ width: '100%', height:"500px" }} />
+                            </Paper>
+                            </Grid>
+                            <Grid item md={6}>
+                            <Paper>
+                                <img src={require("../assert/StockCake.jpg")} style={{ width: '100%', height:"500px" }} />
+                            </Paper>
+                            </Grid>
+                        
+                          
+                        </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Name"
-                            name="name"
-                            value={formState.name}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                
+                <Grid item xs={12} sm={6} md={6}>
+                    
+                    <Paper elevation={3} style={{ padding: "32px", marginBottom:"120px",borderRadius:"32px"}}>
+                    <Typography variant='h6' align='left' style={{ margin: "32px 0px 16px 0px" }}>Customer Form</Typography>
+                    <form onSubmit={onSubmit}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="ID"
+                                    name="userId"
+                                    value={formState.userId}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    fullWidth
+                                    margin="normal"
+                                    error={!!errors.userId}
+                                    helperText={errors.userId}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Name"
+                                    name="name"
+                                    value={formState.name}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    fullWidth
+                                    margin="normal"
+                                    error={!!errors.name}
+                                    helperText={errors.name}
+                                    disabled={defaulted}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Contact"
+                                    name="contact"
+                                    value={formState.contact}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    fullWidth
+                                    margin="normal"
+                                    error={!!errors.contact}
+                                    helperText={errors.contact}
+                                    disabled={defaulted}
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Price"
+                                name="price"
+                                value={formState.price}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                fullWidth
+                                margin="normal"
+                                error={!!errors.price}
+                                helperText={errors.price}
+                            />
+                        </Grid>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Quantity"
+                                    name="quantity"
+                                    value={formState.quantity}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    fullWidth
+                                    margin="normal"
+                                    error={!!errors.quantity}
+                                    helperText={errors.quantity}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Total"
+                                    name="total"
+                                    value={formState.total}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    fullWidth
+                                    margin="normal"
+                                    error={!!errors.total}
+                                    helperText={errors.total}
+                                    disabled
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Date"
+                                    type="date"
+                                    name="date"
+                                    value={formState.date}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    fullWidth
+                                    margin="normal"
+                                    variant="outlined"
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    error={!!errors.date}
+                                    helperText={errors.date}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                            <FormControl component="fieldset" fullWidth margin="normal" error={!!errors.timeOfDay}>
+                                <FormLabel component="legend" align="left" style={{marginBottom:"16px"}}>Time of Day</FormLabel>
+                                <RadioGroup
+                                    aria-label="timeOfDay"
+                                    name="timeOfDay"
+                                    value={formState.timeOfDay}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    defaultValue="Morning"
+                                    style={{ display: "flex", flexDirection: "row" }}
+                                >
+                                    <FormControlLabel value="Morning" control={<Radio />} label="Morning" />
+                                    <FormControlLabel value="Evening" control={<Radio />} label="Evening" style={{marginLeft:"32px"}}/>
+                                </RadioGroup>
+                                <FormHelperText>{errors.timeOfDay}</FormHelperText>
+                                </FormControl>
+                            </Grid>
+                        </Grid>
+                        <Button
+                            type="submit"
                             fullWidth
-                            margin="normal"
-                            error={!!errors.name}
-                            helperText={errors.name}
-                            disabled={defaulted}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Contact"
-                            name="contact"
-                            value={formState.contact}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            fullWidth
-                            margin="normal"
-                            error={!!errors.contact}
-                            helperText={errors.contact}
-                            disabled={defaulted}
-                        />
-                    </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        label="Price"
-                        name="price"
-                        value={formState.price}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        fullWidth
-                        margin="normal"
-                        error={!!errors.price}
-                        helperText={errors.price}
-                    />
-                </Grid>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Quantity"
-                            name="quantity"
-                            value={formState.quantity}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            fullWidth
-                            margin="normal"
-                            error={!!errors.quantity}
-                            helperText={errors.quantity}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Total"
-                            name="total"
-                            value={formState.total}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            fullWidth
-                            margin="normal"
-                            error={!!errors.total}
-                            helperText={errors.total}
-                            disabled
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Date"
-                            type="date"
-                            name="date"
-                            value={formState.date}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            fullWidth
-                            margin="normal"
-                            variant="outlined"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            error={!!errors.date}
-                            helperText={errors.date}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                    <FormControl component="fieldset" fullWidth margin="normal" error={!!errors.timeOfDay}>
-                        <FormLabel component="legend" align="left" style={{marginBottom:"16px"}}>Time of Day</FormLabel>
-                        <RadioGroup
-                            aria-label="timeOfDay"
-                            name="timeOfDay"
-                            value={formState.timeOfDay}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            defaultValue="Morning"
-                            style={{ display: "flex", flexDirection: "row" }}
+                            variant="contained"
+                            color="primary"
+                            style={{ background: buttonClicked ? "#F36054" : "#F38872", margin: "32px 0px 40px 0px", alignItems: "center", padding: "16px" }}
                         >
-                            <FormControlLabel value="Morning" control={<Radio />} label="Morning" />
-                            <FormControlLabel value="Evening" control={<Radio />} label="Evening" style={{marginLeft:"32px"}}/>
-                        </RadioGroup>
-                        <FormHelperText>{errors.timeOfDay}</FormHelperText>
-                        </FormControl>
-                    </Grid>
-                </Grid>
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    style={{ background: "#F36054", margin: "32px 0px 40px 0px", alignItems: "center", padding: "16px" }}
-                >
-                    Submit
-                </Button>
-            </form>
-            </Paper>
+                            Submit
+                        </Button>
+                    </form>
+                    </Paper>
+            </Grid>
+            </Grid>
             <Dialog open={openDialog} onClose={handleCloseDialog}>
                 <DialogTitle>Submission Successful</DialogTitle>
                 <DialogContent>
@@ -355,7 +402,7 @@ const FormData = () => {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog} color="#F38872">
+                    <Button onClick={handleCloseDialog} style={{ color: "#F38872" }}>
                         Okay
                     </Button>
                 </DialogActions>
