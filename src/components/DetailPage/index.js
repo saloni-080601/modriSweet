@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
     Container, Typography, Box, Table, TableBody, TableCell, TableHead, TableRow, 
-    TextField, Button, IconButton, Grid, Paper, useMediaQuery 
+    TextField, Button, IconButton, Grid, Paper, useMediaQuery, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import axios from 'axios';
@@ -32,6 +32,8 @@ const DetailPage = () => {
     });
     const [sortOrder, setSortOrder] = useState('asc'); // State to keep track of sorting order
     const [editrow,setEditrow]=useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [userIdToDelete, setUserIdToDelete] = useState(null);
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -64,10 +66,17 @@ const DetailPage = () => {
         setOpen(true);
     };
 
+    const handleDeleteConfirmation = (userId) => {
+        setUserIdToDelete(userId);
+        setDeleteDialogOpen(true);
+    };
+
     const handleDelete = async (row) => {
         try {
-            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/id/${row.id}`);
+            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/id/${userIdToDelete}`);
             window.location.reload();
+            setDeleteDialogOpen(false);
+            setUserIdToDelete(null);
         } catch (error) {
             console.error('Error deleting entry', error);
         }
@@ -202,7 +211,7 @@ const DetailPage = () => {
                                         }>
                                             <Edit />
                                         </IconButton>
-                                        <IconButton onClick={() => handleDelete(row)}>
+                                        <IconButton onClick={() => handleDeleteConfirmation(row.id)}>
                                             <Delete />
                                         </IconButton>
                                     </TableCell>
@@ -231,6 +240,25 @@ const DetailPage = () => {
                     setFormOpen={setFormOpen}
                 />
             )}
+             <Dialog
+                    open={deleteDialogOpen}
+                    onClose={() => setDeleteDialogOpen(false)}
+                >
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Are you sure you want to delete this record? This action cannot be undone.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleDelete} color="secondary">
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
         </Container>
     );
 };

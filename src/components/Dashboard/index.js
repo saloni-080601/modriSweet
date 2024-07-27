@@ -13,6 +13,11 @@ import { Container,
     Button, 
     TablePagination, 
     useMediaQuery,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
     Grid} from '@mui/material';
 import axios from 'axios';
 import SearchBar from './SearchBar';
@@ -43,6 +48,9 @@ const Dashboard = () => {
     const [formOpen, setFormOpen] = useState("main");
     const [sheetData, setSheetData] = useState([]);
     const [order, setOrder] = useState('asc');
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [userIdToDelete, setUserIdToDelete] = useState(null);
+
 
     useEffect(() => {
         fetchData();
@@ -133,11 +141,13 @@ const Dashboard = () => {
     };
 
     const handleDelete = async (event, userId) => {
-        event.stopPropagation();
+        
         try {
-            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/userId/${userId}`);
+            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/userId/${userIdToDelete}`);
             console.log('Record deleted successfully');
             fetchData();
+            setDeleteDialogOpen(false);
+            setUserIdToDelete(null);
         } catch (error) {
             console.error('Error deleting record:', error);
         }
@@ -176,7 +186,10 @@ const Dashboard = () => {
         });
         setData(sortedData);
     };
-
+    const handleDeleteConfirmation = (userId) => {
+        setUserIdToDelete(userId);
+        setDeleteDialogOpen(true);
+    };
 
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
@@ -270,8 +283,13 @@ const Dashboard = () => {
                                         <Button
                                             variant="contained"
                                             color="secondary"
-                                            onClick={(event) => handleDelete(event, row.userId)}
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                handleDeleteConfirmation(row.userId);
+
+                                            }}
                                             style={{ marginLeft: '8px' }}
+                                            
                                         >
                                             <Delete />
                                         </Button>
@@ -282,6 +300,25 @@ const Dashboard = () => {
                     </Table>
                 </Paper>
             </Box>
+                <Dialog
+                    open={deleteDialogOpen}
+                    onClose={() => setDeleteDialogOpen(false)}
+                >
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Are you sure you want to delete this record? This action cannot be undone.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleDelete} color="secondary">
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
         </Container>
     );
 };

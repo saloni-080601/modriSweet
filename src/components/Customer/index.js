@@ -13,7 +13,13 @@ import {
     TableRow,
     TablePagination,
     TableSortLabel,
-    IconButton
+    IconButton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    Button
 } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -34,6 +40,8 @@ const Customer = () => {
     const [open, setOpen] = useState(false);
     const [formOpen, setFormOpen] = useState("main");
     const [isEdit, setIsEdit] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [userIdToDelete, setUserIdToDelete] = useState(null);
 
     useEffect(() => {
         const fetchDetail = async () => {
@@ -99,23 +107,26 @@ const Customer = () => {
         setFormState(row);  // Ensure form state is populated with the selected row's data
         setOpen(true);
     };
-
+    const handleDeleteConfirmation = (userId) => {
+        setUserIdToDelete(userId);
+        setDeleteDialogOpen(true);
+    };
     const handleDelete = async (userId) => {
         try {
-            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet/userId/${userId}`)&&
-            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/userId/${userId}`);
+            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet/userId/${userIdToDelete}`)&&
+            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/userId/${userIdToDelete}`);
             
             window.location.reload();
+            setDeleteDialogOpen(false);
+            setUserIdToDelete(null);
         } catch (error) {
             console.error('Error deleting entry', error);
         }
+
+
     };
 
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
-    if (!rowData.length) {
-        return <Typography>Loading...</Typography>;
-    }
 
     return (
         <Container maxWidth="lg" style={{ marginTop: "160px" }}>
@@ -161,6 +172,7 @@ const Customer = () => {
                     <Table style={{ margin: "32px 0px" }} className={isSmallScreen ? 'responsive-table' : ''}>
                         <TableHead>
                             <TableRow>
+                                <TableCell className='table-header'></TableCell>
                                 <TableCell className='table-header'><strong>Name</strong></TableCell>
                                 <TableCell className='table-header'><strong>Contact</strong></TableCell>
                                 <TableCell className='table-header'>
@@ -178,6 +190,7 @@ const Customer = () => {
                         <TableBody>
                             {paginatedData.map((row, index) => (
                                 <TableRow key={index}>
+                                    <TableCell>{index+1}</TableCell>
                                     <TableCell data-label="Name">{row.name}</TableCell>
                                     <TableCell data-label="Contact">{row.contact}</TableCell>
                                     <TableCell data-label="UserId">{row.userId}</TableCell>
@@ -185,7 +198,10 @@ const Customer = () => {
                                         <IconButton onClick={() => handleEdit(row)}>
                                             <EditIcon />
                                         </IconButton>
-                                        <IconButton onClick={() => handleDelete(row.userId)}>
+                                        <IconButton onClick={(event) => {
+                                                handleDeleteConfirmation(row.userId);
+
+                                            }}>
                                             <DeleteIcon />
                                         </IconButton>
                                     </TableCell>
@@ -208,6 +224,25 @@ const Customer = () => {
                         formOpen={formOpen}
                     />
                     }
+                    <Dialog
+                    open={deleteDialogOpen}
+                    onClose={() => setDeleteDialogOpen(false)}
+                >
+                    <DialogTitle>Confirm Deletion</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Are you sure you want to delete this record? This action cannot be undone.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleDelete} color="secondary">
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
                
             </Box>
         </Container>
