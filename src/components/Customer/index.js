@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Container, Typography, Box, Table, TableBody, TableCell, TableHead, TableRow, TextField,
-    Paper, TableSortLabel, TablePagination, IconButton, Dialog, DialogActions, DialogContent,
-    DialogTitle, Button, useMediaQuery
+    Container,
+    Box,
+    Typography,
+    TextField,
+    InputAdornment,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    TablePagination,
+    TableSortLabel,
+    IconButton
 } from '@mui/material';
-import axios from 'axios';
-import InputAdornment from '@mui/material/InputAdornment';
+import { useMediaQuery } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import './style.css';
+import axios from 'axios';
 import Form from '../Form';
 
 const Customer = () => {
@@ -66,8 +76,12 @@ const Customer = () => {
         setFilteredData(sortedData);
     };
 
-    const handleFormSubmit = async () => {
+    // Ensure data is sorted in ascending order by default
+    useEffect(() => {
+        handleSort();
+    }, [rowData]); // Run handleSort when rowData changes
 
+    const handleFormSubmit = async () => {
         const { name, contact, userId } = formState;
         const formData = { name, contact, userId };
         console.log(formData);
@@ -86,7 +100,6 @@ const Customer = () => {
         setOpen(true);
     };
 
-    
     const handleDelete = async (userId) => {
         try {
             await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet/userId/${userId}`)&&
@@ -107,17 +120,18 @@ const Customer = () => {
     return (
         <Container maxWidth="lg" style={{ marginTop: "160px" }}>
             <Box my={4}>
-                <Typography
-                    variant="h4"
-                    component="h1"
-                    gutterBottom
-                    style={{ marginTop: "80px" }}
-                    align='left'
-                    ml={2}
-                >
-                    Customer List
-                </Typography>
+                
                 <Paper elevation={2} style={{ padding: "32px", margin: "16px 0px" }}>
+                    <Typography
+                        variant="h6"
+                        component="h1"
+                        gutterBottom
+                        mt={2}
+                        align='left'
+                        
+                    >
+                        Customer List
+                    </Typography>
                     <Box mb={2} align="left"
                         style={{ margin: "32px 0px", display: "flex", justifyContent: "space-between", }}>
                         <TextField
@@ -201,3 +215,4 @@ const Customer = () => {
 };
 
 export default Customer;
+

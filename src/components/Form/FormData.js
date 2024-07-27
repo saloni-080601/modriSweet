@@ -1,6 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Container, TextField, Button, Typography, FormControl, InputLabel, Select, MenuItem, FormHelperText, Grid
+    Container, 
+    TextField, 
+    Button, 
+    Typography,
+    FormControl, 
+    RadioGroup,
+    FormControlLabel,
+    FormLabel,
+    Radio,
+    Grid,
+    Paper,
+    FormHelperText,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions
 } from '@mui/material';
 import axios from 'axios';
 
@@ -18,6 +34,7 @@ const FormData = () => {
         userId: ''
     });
     const [sheetData, setSheetData] = useState([]);
+    const [openDialog, setOpenDialog] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -59,13 +76,52 @@ const FormData = () => {
         }));
     };
 
-    useEffect(()=>{
-       
-        if ( formState.quantity || formState.price) {
+    useEffect(() => {
+        if (formState.quantity || formState.price) {
             const newTotal = formState.price * formState.quantity;
             setFormState(prevState => ({ ...prevState, total: newTotal }));
         }
-    },[formState.quantity, formState.price]);
+    }, [formState.quantity, formState.price]);
+
+    const validateField = (name, value) => {
+        let tempErrors = { ...errors };
+        
+        switch(name) {
+            case 'userId':
+                tempErrors.userId = (!value || isNaN(value)) ? "Valid ID is required" : "";
+                break;
+            case 'name':
+                tempErrors.name = value ? "" : "Name is required";
+                break;
+            case 'contact':
+                tempErrors.contact = (!value || !/^\d{10}$/.test(value)) ? "Contact must be a 10-digit number" : "";
+                break;
+            case 'quantity':
+                tempErrors.quantity = (!value || isNaN(value) || value <= 0) ? "Valid quantity is required" : "";
+                break;
+            case 'total':
+                tempErrors.total = (!value || isNaN(value) || value <= 0) ? "Valid total is required" : "";
+                break;
+            case 'price':
+                tempErrors.price = (!value || isNaN(value) || value <= 0) ? "Valid price is required" : "";
+                break;
+            case 'date':
+                tempErrors.date = value ? "" : "Date is required";
+                break;
+            case 'timeOfDay':
+                tempErrors.timeOfDay = value ? "" : "Time of day is required";
+                break;
+            default:
+                break;
+        }
+
+        setErrors(tempErrors);
+    };
+
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
+        validateField(name, value);
+    };
 
     const validate = () => {
         let tempErrors = {};
@@ -87,10 +143,30 @@ const FormData = () => {
         const formData = { name, contact, quantity, price, total, date, timeOfDay, userId };
 
         try {
+            // First API call
+            const responseOriginalSheet = await axios.post(
+                'https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25',
+                formData,
+                {
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+
+            if (responseOriginalSheet.status === 200) {
+                console.log('Form submitted successfully');
+            } else {
+                console.error('Failed to submit form');
+            }
+
+            // Check if user exists in sheetData
             const userExistsInSheet2 = sheetData.some(item => item.userId === userId);
 
             if (!userExistsInSheet2) {
-                const postResponse = await axios.post('https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet', formData);
+                // Second API call
+                const postResponse = await axios.post(
+                    'https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet',
+                    formData
+                );
 
                 if (postResponse.status === 200) {
                     console.log('Data posted to sheet2 successfully');
@@ -101,24 +177,28 @@ const FormData = () => {
                 console.log('User already exists in sheet2. Skipping the entry.');
             }
 
-            const responseOriginalSheet = await fetch(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25`, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
+            // Clear form fields after successful submission
+            setFormState({
+                name: '',
+                contact: '',
+                quantity: '',
+                total: '',
+                date: '',
+                price: '',
+                timeOfDay: '',
+                userId: ''
             });
+            setErrors({});
+            setDefaulted(false);
 
-            if (responseOriginalSheet.ok) {
-                console.log('Form submitted successfully');
-            } else {
-                console.error('Failed to submit form');
-            }
+            // Open dialog to show submission success
+            setOpenDialog(true);
+
         } catch (error) {
             console.error('Error submitting form:', error);
         }
     };
-
+ 
     const onSubmit = (e) => {
         e.preventDefault();
         if (validate()) {
@@ -126,9 +206,14 @@ const FormData = () => {
         }
     };
 
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
     return (
         <Container maxWidth="md" style={{ marginTop: "140px" }}>
-            <Typography variant='h4' align='left' style={{ margin: "32px 0px 16px 0px" }}>Customer Form</Typography>
+            <Paper elevation={3} style={{ padding: "32px", marginBottom:"120px"}}>
+            <Typography variant='h6' align='left' style={{ margin: "32px 0px 16px 0px" }}>Customer Form</Typography>
             <form onSubmit={onSubmit}>
                 <Grid container spacing={2}>
                     <Grid item xs={12}>
@@ -137,6 +222,7 @@ const FormData = () => {
                             name="userId"
                             value={formState.userId}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             fullWidth
                             margin="normal"
                             error={!!errors.userId}
@@ -149,6 +235,7 @@ const FormData = () => {
                             name="name"
                             value={formState.name}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             fullWidth
                             margin="normal"
                             error={!!errors.name}
@@ -162,6 +249,7 @@ const FormData = () => {
                             name="contact"
                             value={formState.contact}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             fullWidth
                             margin="normal"
                             error={!!errors.contact}
@@ -176,6 +264,7 @@ const FormData = () => {
                         name="price"
                         value={formState.price}
                         onChange={handleChange}
+                        onBlur={handleBlur}
                         fullWidth
                         margin="normal"
                         error={!!errors.price}
@@ -189,6 +278,7 @@ const FormData = () => {
                             name="quantity"
                             value={formState.quantity}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             fullWidth
                             margin="normal"
                             error={!!errors.quantity}
@@ -201,10 +291,12 @@ const FormData = () => {
                             name="total"
                             value={formState.total}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             fullWidth
                             margin="normal"
                             error={!!errors.total}
                             helperText={errors.total}
+                            disabled
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -214,6 +306,7 @@ const FormData = () => {
                             name="date"
                             value={formState.date}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             fullWidth
                             margin="normal"
                             variant="outlined"
@@ -225,18 +318,21 @@ const FormData = () => {
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <FormControl fullWidth margin="normal" variant="outlined" error={!!errors.timeOfDay}>
-                            <InputLabel>Time of Day</InputLabel>
-                            <Select
-                                name="timeOfDay"
-                                value={formState.timeOfDay}
-                                onChange={handleChange}
-                                label="Time of Day"
-                            >
-                                <MenuItem value="Morning">Morning</MenuItem>
-                                <MenuItem value="Evening">Evening</MenuItem>
-                            </Select>
-                            <FormHelperText>{errors.timeOfDay}</FormHelperText>
+                    <FormControl component="fieldset" fullWidth margin="normal" error={!!errors.timeOfDay}>
+                        <FormLabel component="legend" align="left" style={{marginBottom:"16px"}}>Time of Day</FormLabel>
+                        <RadioGroup
+                            aria-label="timeOfDay"
+                            name="timeOfDay"
+                            value={formState.timeOfDay}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            defaultValue="Morning"
+                            style={{ display: "flex", flexDirection: "row" }}
+                        >
+                            <FormControlLabel value="Morning" control={<Radio />} label="Morning" />
+                            <FormControlLabel value="Evening" control={<Radio />} label="Evening" style={{marginLeft:"32px"}}/>
+                        </RadioGroup>
+                        <FormHelperText>{errors.timeOfDay}</FormHelperText>
                         </FormControl>
                     </Grid>
                 </Grid>
@@ -245,11 +341,25 @@ const FormData = () => {
                     fullWidth
                     variant="contained"
                     color="primary"
-                    style={{ background: "#B11226", margin: "32px 0px 120px 0px", alignItems: "center", padding: "16px" }}
+                    style={{ background: "#F36054", margin: "32px 0px 40px 0px", alignItems: "center", padding: "16px" }}
                 >
                     Submit
                 </Button>
             </form>
+            </Paper>
+            <Dialog open={openDialog} onClose={handleCloseDialog}>
+                <DialogTitle>Submission Successful</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        The form has been submitted successfully.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="#F38872">
+                        Okay
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 };

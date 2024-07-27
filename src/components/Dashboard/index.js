@@ -53,12 +53,14 @@ const Dashboard = () => {
     const fetchData = async () => {
         try {
             const response = await axios.get('https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25');
-            const fetchedData = response.data;
-
+            let fetchedData = response.data;
+    
+            // Sort data by userId in ascending order
+            fetchedData = fetchedData.sort((a, b) => a.userId - b.userId);
+    
             const seenIds = new Set();
             const uniqueData = [];
-            let maxId = 0;
-
+    
             fetchedData.forEach(item => {
                 if (!seenIds.has(item.userId)) {
                     seenIds.add(item.userId);
@@ -70,6 +72,7 @@ const Dashboard = () => {
             console.error('Error fetching data', error);
         }
     };
+    
     
 
     useEffect(() => {
@@ -174,6 +177,7 @@ const Dashboard = () => {
         setData(sortedData);
     };
 
+
     const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     const isSmallScreen = useMediaQuery('(max-width:600px)');
@@ -196,16 +200,17 @@ const Dashboard = () => {
             }
 
             <Box my={4}>
-                <Typography 
-                variant="h4" 
-                component="h1" 
-                gutterBottom 
-                align='left' 
-                ml={2}
-                >
+            <Paper elevation={4} style={{ marginTop: "16px", padding: "32px", }}>
+                    <Typography 
+                    variant='h6'
+                    gutterBottom 
+                    align='left' 
+                    mt={2}
+                    ml={2}
+                    >
                     Dashboard
-                </Typography>
-                <Paper elevation={4} style={{ marginTop: "16px", padding: "32px", }}>
+                    </Typography>
+                
                 
                     <Grid container spacing={2} style={{padding:"16px"}}>
                         <Grid  item xs={12} sm={6} md={6} align="left" ><SearchBar onSearch={handleSearch} /></Grid>

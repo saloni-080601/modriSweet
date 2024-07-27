@@ -98,11 +98,6 @@ const DetailPage = () => {
         setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     };
 
-    const formatDate = (dateStr) => {
-        const [year, month, day] = dateStr.split('-');
-        return `${day}/${month}/${year}`;
-    };
-
     if (!filteredData) {
         return <Typography>Loading...</Typography>;
     }
@@ -112,8 +107,10 @@ const DetailPage = () => {
     return (
         <Container maxWidth="lg" style={{ marginTop: "160px" }}>
             <Box my={4}>
+               
+                <Paper elevation={2} style={{padding:"32px"}}>
                 <Typography 
-                    variant="h4"
+                    variant="h6"
                     component="h1" 
                     gutterBottom 
                     align='left'
@@ -170,7 +167,6 @@ const DetailPage = () => {
                         </Grid>
                     </Grid>
                 </Box>
-                <Paper elevation={2} style={{padding:"32px"}}>
                     <Table className={isSmallScreen ? 'responsive-table' : ''}>
                         <TableHead>
                             <TableRow>
@@ -196,7 +192,7 @@ const DetailPage = () => {
                                     <TableCell data-label="Price">{row.price}</TableCell>
                                     <TableCell data-label="Quantity">{row.quantity}</TableCell>
                                     
-                                    <TableCell data-label="Date">{formatDate(row.date)}</TableCell>
+                                    <TableCell data-label="Date">{row.date}</TableCell>
                                     <TableCell data-label="Time">{row.timeOfDay}</TableCell>
                                     <TableCell data-label="Total">{row.total}</TableCell>
                                     <TableCell data-label="Action">
@@ -213,7 +209,7 @@ const DetailPage = () => {
                                 </TableRow>
                             ))}
                             <TableRow>
-                                <TableCell colSpan={7} align="right"><strong>Total Sum</strong></TableCell>
+                                <TableCell colSpan={8} align="right"><strong>Total Sum</strong></TableCell>
                                 <TableCell><strong>{totalSum.toFixed(2)}</strong></TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
