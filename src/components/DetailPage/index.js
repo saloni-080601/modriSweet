@@ -38,7 +38,7 @@ const DetailPage = () => {
     useEffect(() => {
         const fetchDetail = async () => {
             try {
-                const response = await axios.get("https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25");
+                const response = await axios.get("https://sheet.best/api/sheets/9697d33f-b89f-4a8f-9bbc-f556da4faa22");
                 const fetchedData = response.data;
                 setRowData(fetchedData);
                 setFilteredData(fetchedData.filter((row) => row.userId === id));
@@ -73,7 +73,7 @@ const DetailPage = () => {
 
     const handleDelete = async (row) => {
         try {
-            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/id/${userIdToDelete}`);
+            await axios.delete(`https://sheet.best/api/sheets/9697d33f-b89f-4a8f-9bbc-f556da4faa22/id/${userIdToDelete}`);
             window.location.reload();
             setDeleteDialogOpen(false);
             setUserIdToDelete(null);

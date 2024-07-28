@@ -46,7 +46,7 @@ const Customer = () => {
     useEffect(() => {
         const fetchDetail = async () => {
             try {
-                const response = await axios.get("https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet");
+                const response = await axios.get("https://sheet.best/api/sheets/9697d33f-b89f-4a8f-9bbc-f556da4faa22/tabs/employesheet");
                 const fetchedData = response.data;
                 setRowData(fetchedData);
                 setFilteredData(fetchedData); // Initialize filtered data
@@ -94,7 +94,7 @@ const Customer = () => {
         const formData = { name, contact, userId };
         console.log(formData);
         try {
-            await axios.put(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet/userId/${formData.userId}`, formData);
+            await axios.put(`https://sheet.best/api/sheets/9697d33f-b89f-4a8f-9bbc-f556da4faa22/tabs/employesheet/userId/${formData.userId}`, formData);
             window.location.reload();
         } catch (error) {
             console.error('Error updating entry', error);
@@ -113,8 +113,8 @@ const Customer = () => {
     };
     const handleDelete = async (userId) => {
         try {
-            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet/userId/${userIdToDelete}`)&&
-            await axios.delete(`https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/userId/${userIdToDelete}`);
+            await axios.delete(`https://sheet.best/api/sheets/9697d33f-b89f-4a8f-9bbc-f556da4faa22/tabs/employesheet/userId/${userIdToDelete}`)&&
+            await axios.delete(`https://sheet.best/api/sheets/9697d33f-b89f-4a8f-9bbc-f556da4faa22/userId/${userIdToDelete}`);
             
             window.location.reload();
             setDeleteDialogOpen(false);

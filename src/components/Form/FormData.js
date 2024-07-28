@@ -40,7 +40,7 @@ const FormData = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet');
+                const response = await axios.get('https://sheet.best/api/sheets/9697d33f-b89f-4a8f-9bbc-f556da4faa22/tabs/employesheet');
                 setSheetData(response.data);
             } catch (error) {
                 console.error('Error fetching data', error);
@@ -146,7 +146,7 @@ const FormData = () => {
         try {
             // First API call
             const responseOriginalSheet = await axios.post(
-                'https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25',
+                'https://sheet.best/api/sheets/9697d33f-b89f-4a8f-9bbc-f556da4faa22',
                 formData,
                 {
                     headers: { 'Content-Type': 'application/json' }
@@ -165,7 +165,7 @@ const FormData = () => {
             if (!userExistsInSheet2) {
                 // Second API call
                 const postResponse = await axios.post(
-                    'https://sheet.best/api/sheets/b23fdf22-f53e-4913-8a85-fd377c475e25/tabs/employesheet',
+                    'https://sheet.best/api/sheets/9697d33f-b89f-4a8f-9bbc-f556da4faa22/tabs/employesheet',
                     formData
                 );
 
@@ -192,7 +192,6 @@ const FormData = () => {
             setErrors({});
             setDefaulted(false);
             setButtonClicked(false); // Reset button state after submission
-
             // Open dialog to show submission success
             setOpenDialog(true);
 
@@ -211,53 +210,12 @@ const FormData = () => {
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
+        window.location.reload(); // Reload the page after submission
     };
 
     return (
-        <Container maxWidth style={{ marginTop: "105px" }}>
-            <Grid container >
-
-                
-                    <Grid item md={6} >
-                        <Grid container>
-                            <Grid item md={6}>
-                            <Paper>
-                                <img src={require("../assert/Coffee.jpg")} style={{ width: '100%' }} />
-                            </Paper>
-                            </Grid>
-                            <Grid item md={6}>
-                            <Paper>
-                                <img src={require("../assert/IceCream.jpg")} style={{ width: '100%' }} />
-                            </Paper>
-                            </Grid>
-                            <Grid item md={6}>
-                            <Paper>
-                                <img src={require("../assert/Cake.jpg")} style={{ width: '100%' }} />
-                            </Paper>
-                            </Grid>
-                            <Grid item md={6}>
-                            <Paper>
-                                <img src={require("../assert/IndiaSweet.jpg")} style={{ width: '100%', height:'450px'}} />
-                            </Paper>
-                            </Grid>
-                            <Grid item md={6}>
-                            <Paper>
-                                <img src={require("../assert/bread.jpg")} style={{ width: '100%', height:"500px" }} />
-                            </Paper>
-                            </Grid>
-                            <Grid item md={6}>
-                            <Paper>
-                                <img src={require("../assert/StockCake.jpg")} style={{ width: '100%', height:"500px" }} />
-                            </Paper>
-                            </Grid>
-                        
-                          
-                        </Grid>
-                    </Grid>
-                
-                <Grid item xs={12} sm={6} md={6}>
-                    
-                    <Paper elevation={3} style={{ padding: "32px", marginBottom:"120px",borderRadius:"32px"}}>
+        <Container maxWidth="md" style={{ marginTop: "105px" }}>      
+                <Paper elevation={3} style={{ padding: "32px", marginBottom:"120px",borderRadius:"32px"}}>
                     <Typography variant='h6' align='left' style={{ margin: "32px 0px 16px 0px" }}>Customer Form</Typography>
                     <form onSubmit={onSubmit}>
                         <Grid container spacing={2}>
@@ -392,8 +350,7 @@ const FormData = () => {
                         </Button>
                     </form>
                     </Paper>
-            </Grid>
-            </Grid>
+            
             <Dialog open={openDialog} onClose={handleCloseDialog}>
                 <DialogTitle>Submission Successful</DialogTitle>
                 <DialogContent>
